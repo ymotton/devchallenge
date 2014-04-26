@@ -5,13 +5,16 @@ import "fmt"
 func main() {
 	lookingFor := uint64(910897038977002)
 	letters := "acdegilmnoprstuww"
-	
-	fmt.Println("IterativeMethod(): ")
+		
+	fmt.Println("iterativeMethod(): ")
 	iterativeMethod(lookingFor, letters)
-	fmt.Println()
 	
 	fmt.Println("logarithmicMethod(): ")
 	logarithmicMethod(lookingFor, letters)
+
+	fmt.Println("bonus: ")
+	bonushash := uint64(34700290059707989)
+	logarithmicMethod(bonushash, letters)
 }
 
 /*
@@ -20,14 +23,15 @@ func main() {
 	for any combination of inputs.
 */
 func iterativeMethod(lookingFor uint64, letters string) {
+	wordlength := determineWordlength(lookingFor, letters)
 	first := letters[0]
 	last := letters[len(letters) - 1]
 	threshold := generate(rune(first), len(letters)) + string(last)
 	sureAbout := ""
-	for charsFound := 0; charsFound < 9; charsFound++ {
+	for charsFound := 0; charsFound < wordlength; charsFound++ {
 		var lastChar rune
 		for j, c := range letters {
-			trial := sureAbout + string(c) + generate(rune(threshold[j]), 8 - charsFound)
+			trial := sureAbout + string(c) + generate(rune(threshold[j]), wordlength - charsFound - 1)
 			fmt.Printf("Trying '%s': ", trial)
 			result := hash(trial)
 			if result == lookingFor {
@@ -46,20 +50,21 @@ func iterativeMethod(lookingFor uint64, letters string) {
 }
 
 func logarithmicMethod(lookingFor uint64, letters string) {
+	wordlength := determineWordlength(lookingFor, letters)
 	first := letters[0]
 	last := letters[len(letters) - 1]
 	threshold := generate(rune(first), len(letters)) + string(last)
 	sureAbout := ""
-	result := logarithmicMethodRec(lookingFor, letters, threshold, 0, len(letters), sureAbout)
+	result := logarithmicMethodRec(lookingFor, letters, wordlength, threshold, 0, len(letters), sureAbout)
 	fmt.Println(result)
 }
 
-func logarithmicMethodRec(lookingFor uint64, letters string, threshold string, startAt int, stopAt int, sureAbout string) string {
+func logarithmicMethodRec(lookingFor uint64, letters string, wordlength int, threshold string, startAt int, stopAt int, sureAbout string) string {
 	charsFound := len(sureAbout)
 	midpoint := (stopAt - startAt) / 2 + startAt
 	candidate := string(letters[midpoint])
 	filler := rune(threshold[midpoint])
-	trial := sureAbout + candidate + generate(filler, 8 - charsFound)
+	trial := sureAbout + candidate + generate(filler, wordlength - charsFound - 1)
 	result := hash(trial)
 
 	fmt.Printf("Trying '%s'\n", trial)
@@ -67,12 +72,24 @@ func logarithmicMethodRec(lookingFor uint64, letters string, threshold string, s
 		return trial
 	} else if midpoint == startAt {
 		sureAbout = sureAbout + candidate
-		return logarithmicMethodRec(lookingFor, letters, threshold, 0, len(letters), sureAbout)
+		return logarithmicMethodRec(lookingFor, letters, wordlength, threshold, 0, len(letters), sureAbout)
 	} else if result > lookingFor {
-		return logarithmicMethodRec(lookingFor, letters, threshold, startAt, midpoint, sureAbout)
+		return logarithmicMethodRec(lookingFor, letters, wordlength, threshold, startAt, midpoint, sureAbout)
 	} 
 	
-	return logarithmicMethodRec(lookingFor, letters, threshold, midpoint, stopAt, sureAbout)
+	return logarithmicMethodRec(lookingFor, letters, wordlength, threshold, midpoint, stopAt, sureAbout)
+}
+
+func determineWordlength(lookingFor uint64, letters string) int {
+	first := letters[0]
+	for i := 1; i < 12; i++ {
+		candidate := generate(rune(first), i)
+		h := hash(candidate)
+		if lookingFor < h {
+			return i - 1
+		}
+	} 
+	return 0
 }
 
 // As per provided pseudo-code
