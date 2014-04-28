@@ -12,9 +12,12 @@ func main() {
 	fmt.Println("logarithmicMethod(): ")
 	logarithmicMethod(lookingFor, letters)
 
+	fmt.Println("reverseMethod(): ")
+	reverseMethod(lookingFor, letters)
+
 	fmt.Println("bonus: ")
 	bonushash := uint64(34700290059707989)
-	logarithmicMethod(bonushash, letters)
+	reverseMethod(bonushash, letters)
 }
 
 /*
@@ -90,6 +93,28 @@ func determineWordlength(lookingFor uint64, letters string) int {
 		}
 	} 
 	return 0
+}
+
+func reverseMethod(lookingFor uint64, letters string) {
+	result := reverseMethodRec(lookingFor, letters)
+	if result == "" {
+		fmt.Println("No result found!")
+	} else {
+		fmt.Println(result)
+	}
+}
+
+func reverseMethodRec(lookingFor uint64, letters string) string {
+	if lookingFor == 7 {
+		return ""
+	}
+	for i, c := range letters {
+		trial := lookingFor - uint64(i)
+		if trial % 37 == 0 {
+			return reverseMethodRec(trial / 37, letters) + string(c)
+		}
+	}
+	return ""
 }
 
 // As per provided pseudo-code
