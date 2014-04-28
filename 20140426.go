@@ -3,6 +3,9 @@ package main
 import "fmt"
 
 func main() {
+	fmt.Println("NAIS DEV CHALLENGE 20140426")
+	fmt.Println()
+
 	lookingFor := uint64(910897038977002)
 	letters := "acdegilmnoprstuww"
 		
