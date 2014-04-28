@@ -105,7 +105,7 @@ func reverseMethod(lookingFor uint64, letters string) {
 }
 
 func reverseMethodRec(lookingFor uint64, letters string) string {
-	if lookingFor == 7 {
+	if lookingFor < 8 {
 		return ""
 	}
 	for i, c := range letters {
